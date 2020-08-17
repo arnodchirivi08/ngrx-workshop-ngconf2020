@@ -7,7 +7,7 @@ import {
   BookRequiredProps
 } from "src/app/shared/models";
 import { BooksService } from "src/app/shared/services";
-import { BooksPageActions } from '../../actions';
+import { BooksPageActions, BooksApiActions } from '../../actions';
 
 
 
@@ -22,7 +22,7 @@ export class BooksPageComponent implements OnInit {
   total: number = 0;
 
   constructor(private booksService: BooksService,
-              private store: Store<State>) {}
+    private store: Store<State>) { }
 
   ngOnInit() {
     this.store.dispatch(BooksPageActions.enter());
@@ -32,9 +32,11 @@ export class BooksPageComponent implements OnInit {
 
   getBooks() {
     this.booksService.all().subscribe(books => {
+      this.store.dispatch(BooksApiActions.booksLoaded({ books }))
       this.books = books;
       this.updateTotals(books);
-    });
+    },
+    (error) => this.store.dispatch(BooksApiActions.booksLoadedError({ error })));
   }
 
   updateTotals(books: BookModel[]) {
@@ -57,7 +59,6 @@ export class BooksPageComponent implements OnInit {
 
   onSave(book: BookRequiredProps | BookModel) {
     if ("id" in book) {
-      this.store.dispatch(BooksPageActions.updateBook({ bookId: book.id, changes: book}));
       this.updateBook(book);
     } else {
       this.saveBook(book);
@@ -65,25 +66,36 @@ export class BooksPageComponent implements OnInit {
   }
 
   saveBook(bookProps: BookRequiredProps) {
-    this.booksService.create(bookProps).subscribe(() => {
-      this.store.dispatch(BooksPageActions.createBook({ book: bookProps }));
+    this.store.dispatch(BooksPageActions.createBook({ book: bookProps }));
+
+    this.booksService.create(bookProps).subscribe(book => {
+      this.store.dispatch(BooksApiActions.bookCreated({ book }));
       this.getBooks();
       this.removeSelectedBook();
-    });
+    },
+    (error) => this.store.dispatch(BooksApiActions.bookCreatedError({ error })));
   }
 
   updateBook(book: BookModel) {
-    this.booksService.update(book.id, book).subscribe(() => {
+    this.store.dispatch(
+      BooksPageActions.updateBook({ bookId: book.id, changes: book })
+    );
+    this.booksService.update(book.id, book).subscribe(book => {
+      this.store.dispatch(BooksApiActions.bookUpdated({ book }));
       this.getBooks();
       this.removeSelectedBook();
-    });
+    },
+    (error) => this.store.dispatch(BooksApiActions.bookUpdatedError({ error })));
   }
 
   onDelete(book: BookModel) {
+    this.store.dispatch(BooksPageActions.deleteBook({ bookId: book.id }));
+
     this.booksService.delete(book.id).subscribe(() => {
-      this.store.dispatch(BooksPageActions.deleteBook({ bookId: book.id }));
+      this.store.dispatch(BooksApiActions.bookDeleted({ idBook: book.id }));
       this.getBooks();
       this.removeSelectedBook();
-    });
+    },
+    (error) => this.store.dispatch(BooksApiActions.bookDeletedError({ error })));
   }
 }

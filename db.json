@@ -25,22 +25,10 @@
       "description": "Novela de Antoine de Saint-Exupéry"
     },
     {
-      "id": "53cf22b5-7fd6-46f8-bdc5-58ce74bb48a4",
-      "name": "Pino",
-      "earnings": "111",
-      "description": null
-    },
-    {
-      "id": "6f281484-0f6b-4e13-b15a-c5a4915fb486",
-      "name": "sdasd",
-      "earnings": "5",
-      "description": null
-    },
-    {
-      "id": "af45be87-ec15-4d23-8abf-885f2ad0de26",
-      "name": "sdasd",
-      "earnings": "5",
-      "description": null
+      "id": "ac6803aa-59ba-43e1-a242-c5981d2fc5c6",
+      "name": "PinoCho",
+      "earnings": "102000",
+      "description": "Pinocho version 1"
     }
   ]
 }
